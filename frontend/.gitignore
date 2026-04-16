@@ -1,0 +1,13 @@
+.env
+node_modules/
+npm-debug.log
+yarn-error.log
+build/
+dist/
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+.env.local
+.env.*.local
