@@ -11,7 +11,7 @@ jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # Database Configuration (SQLite for development, PostgreSQL for production)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///student_performance.db')
@@ -39,13 +39,21 @@ def create_app():
     
     return app
 
+
 app = create_app()
+
+# Create tables when the app is created (needed for gunicorn/Render)
+with app.app_context():
+    db.create_all()
+
+# Add a default route for '/'
+@app.route('/')
+def index():
+    return '<h2>Welcome to the Student Performance API. Try /api/health for a health check.</h2>'
 
 @app.route('/api/health', methods=['GET'])
 def health():
     return jsonify({'status': 'healthy', 'message': 'Server is running'}), 200
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=False, host='0.0.0.0', port=5000)

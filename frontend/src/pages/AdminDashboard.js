@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import useAuthStore from '../store/authStore';
 import DataImport from './DataImport';
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
-  const [predictions, setPredictions] = useState([]);
   const [riskDistribution, setRiskDistribution] = useState(null);
   const [topPerformers, setTopPerformers] = useState([]);
   const [atRiskStudents, setAtRiskStudents] = useState([]);
@@ -15,10 +14,11 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('analytics');
   
   const token = useAuthStore((state) => state.token);
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   
   useEffect(() => {
     fetchDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const fetchDashboardData = async () => {
@@ -26,16 +26,14 @@ const AdminDashboard = () => {
       setLoading(true);
       const headers = { Authorization: `Bearer ${token}` };
       
-      const [dashboard, preds, risk, top, atRisk] = await Promise.all([
+      const [dashboard, risk, top, atRisk] = await Promise.all([
         axios.get(`${API_BASE}/admin/dashboard`, { headers }),
-        axios.get(`${API_BASE}/predictions/all`, { headers }),
         axios.get(`${API_BASE}/admin/analytics/risk-distribution`, { headers }),
         axios.get(`${API_BASE}/admin/analytics/top-performers`, { headers }),
         axios.get(`${API_BASE}/admin/analytics/at-risk-students`, { headers })
       ]);
       
       setDashboardData(dashboard.data);
-      setPredictions(preds.data);
       setRiskDistribution(risk.data);
       setTopPerformers(top.data);
       setAtRiskStudents(atRisk.data);

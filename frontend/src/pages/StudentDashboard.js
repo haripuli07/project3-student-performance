@@ -5,18 +5,18 @@ import useAuthStore from '../store/authStore';
 const StudentDashboard = () => {
   const [studentData, setStudentData] = useState(null);
   const [prediction, setPrediction] = useState(null);
-  const [predictionHistory, setPredictionHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
   const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   
   useEffect(() => {
     if (user?.student?.id) {
       fetchStudentData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   
   const fetchStudentData = async () => {
@@ -30,7 +30,6 @@ const StudentDashboard = () => {
       ]);
       
       setStudentData(student.data);
-      setPredictionHistory(hist.data);
       
       if (hist.data.length > 0) {
         setPrediction(hist.data[0]);
